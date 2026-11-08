@@ -1,0 +1,34 @@
+name: Autograding Tests
+
+'on':
+  repository_dispatch:
+  schedule:
+    - cron: '0 7 * * *'
+
+permissions:
+  checks: write
+  actions: read
+  contents: read
+
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: assignment 9 test
+        id: assignment-9-test
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: assignment 9 test
+          setup-command: ''
+          command: make test
+          timeout: 3
+          max-score: 100
+      - name: Autograding Reporter
+        uses: classroom-resources/autograding-grading-reporter@v1
+        env:
+          ASSIGNMENT-9-TEST_RESULTS: "${{steps.assignment-9-test.outputs.result}}"
+        with:
+          runners: assignment-9-test
